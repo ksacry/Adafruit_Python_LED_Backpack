@@ -176,8 +176,13 @@ class SevenSegment(HT16K33.HT16K33):
 		if length > 4:
 			self.print_number_str('----')
 			return
-		# Calculcate starting position of digits based on justification.
-		pos = (4-length) if justify_right else 0
+		# Add spaces based on justification
+		pos = 0
+		if length < 4:
+			if justify_right:
+				value = '%s%s' % (' ' * (4 - length), value)
+			else:
+				value = '%s%s' % (value, ' ' * (4 - length))
 		# Go through each character and print it on the display.
 		for i, ch in enumerate(value):
 			if ch == '.':
