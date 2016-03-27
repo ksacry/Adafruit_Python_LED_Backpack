@@ -45,15 +45,24 @@ class HT16K33(object):
 			i2c = I2C
 		self._device = i2c.get_i2c_device(address, **kwargs)
 		self.buffer = bytearray([0]*16)
+                self.suspended = True
 
 	def begin(self):
 		"""Initialize driver with LEDs enabled and all turned off."""
 		# Turn on the oscillator.
-		self._device.writeList(HT16K33_SYSTEM_SETUP | HT16K33_OSCILLATOR, [])
+                self.resume()
 		# Turn display on with no blinking.
 		self.set_blink(HT16K33_BLINK_OFF)
 		# Set display to full brightness.
 		self.set_brightness(15)
+
+        def suspend(self):
+		self._device.writeList(HT16K33_SYSTEM_SETUP, [0x00])
+                self.suspended = True
+
+        def resume(self):
+		self._device.writeList(HT16K33_SYSTEM_SETUP | HT16K33_OSCILLATOR, [0x00])
+                self.suspended = False
 
 	def set_blink(self, frequency):
 		"""Blink display at specified frequency.  Note that frequency must be a
